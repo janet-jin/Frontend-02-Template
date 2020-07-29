@@ -115,7 +115,7 @@ function tagName(c){
 }
 
 // <body style=""></body>
-function beforeAttributeName(){
+function beforeAttributeName(c){
     if(c.match(/^[\t\n\f ]$/)){
         return beforeAttributeName
     }else if(c == ">" || c == "/" || c == EOF){
@@ -146,7 +146,7 @@ function attributeName(c){
     }
 }
 
-function beforeAttributeValue(){
+function beforeAttributeValue(c){
     if(c.match(/^[\t\n\f ]$/) || c == ">" || c == "/" || c == EOF){
         return beforeAttributeValue
     }else if(c == "\""){
@@ -160,7 +160,7 @@ function beforeAttributeValue(){
     }
 }
 
-function doubleQuotedAttributeValue(){
+function doubleQuotedAttributeValue(c){
    if(c == "\""){
        currentToken[currentAttribute.name] = currentAttribute.value
        return afterQuotedAttributeValue
@@ -174,7 +174,24 @@ function doubleQuotedAttributeValue(){
     }
 }
 
-function singleQuotedAttributeValue(){
+function afterQuotedAttributeValue(c){
+    if(c.match(/^[\t\n\f ]$/)){
+        return beforeAttributeName
+     }else if(c == "/"){
+         return selfClosingStartTag
+     }else if(c == ">"){
+         currentToken[currentAttribute.name] = currentAttribute.value
+         emit(currentToken)
+         return data
+     }else if(c == EOF){
+ 
+     }else{
+         currentAttribute.value += c
+        return doubleQuotedAttributeValue
+     }
+}
+
+function singleQuotedAttributeValue(c){
    if(c == "\""){
        currentToken[currentAttribute.name] = currentAttribute.value
        return afterQuotedAttributeValue
@@ -189,7 +206,7 @@ function singleQuotedAttributeValue(){
     }
 }
 
-function UnquotedAttributeValue(){
+function UnquotedAttributeValue(c){
     if(c.match(/^[\t\n\f ]$/)){
        currentToken[currentAttribute.name] = currentAttribute.value
        return beforeAttributeName
@@ -212,7 +229,7 @@ function UnquotedAttributeValue(){
     }
 }
 
-function selfClosingStartTag(){
+function selfClosingStartTag(c){
     if( c == ">"){
         currentToken.isSelfClosing = true
         return data
@@ -230,6 +247,6 @@ module.exports.parseHTML = function parseHTML(html){
         state = state(c)
     }
     state = state(EOF)
-    // console.log(stack[0])
+    console.log(stack[0])
     return stack[0]
 }
