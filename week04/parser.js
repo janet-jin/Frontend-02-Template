@@ -141,7 +141,7 @@ function attributeName(c){
     }else if(c == "\"" || c == "'" || c == "<"){
 
     }else{
-        currentAttribute += c
+        currentAttribute.name += c
         return attributeName
     }
 }
