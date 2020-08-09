@@ -1,0 +1,4 @@
+思考：为什么 ::first-letter 可以设置 float 之类的，而 ::first-line 不行呢？
+
+回答：
+first-line和first-letter是浏览器布局完成之后的第二次计算。 如果对first-letter的布局进行float重排之后，first formatted line 的布局和内容会改变，而后一旦发现first formatted line被改变，又会触发first-line的重新计算和渲染，最后就变成一个无限循环。 而first-letter只是针对第一个元素做渲染和计算，消耗成本不大。
