@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>title</title>
+    </head>
+    <body>
+        <div id="draggable" style="width:100px;height:100px;background-color:green"></div>
+    </body>
+
+<script>
+    let draggable = document.getElementById("draggable");
+
+    // draggable的translate值
+    let baseX = 0,baseY = 0;
+    // 在mousedown里面监听mousemove,mouseup.因为只有在鼠标按下后才会有拖拽效果，从性能上和逻辑上最合理
+    // 另，mousemove,mouseup需要在document上监听，防止鼠标移动过快离开draggable时无法拖动情况出现
+    draggable.addEventListener("mousedown",function(event){
+        // 存储鼠标的起始点
+        let startX = event.clientX,startY = event.clientY;
+
+        let up = event=>{
+            baseX = baseX + event.clientX - startX;
+            baseY = baseY + event.clientY - startY;
+            document.removeEventListener("mousemove",move)
+            document.removeEventListener("mouseup",up)
+        }
+        let move = event=>{
+           draggable.style.transform =  `translate(${baseX + event.clientX - startX}px,${baseY + event.clientY - startY}px)`
+        }
+        document.addEventListener("mousemove",move)
+        document.addEventListener("mouseup",up)
+
+    })
+
+   
+</script>
+</html>

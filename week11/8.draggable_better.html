@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>title</title>
+    </head>
+    <body>
+        <div id="container">
+            春江潮水连海平，海上明月共潮生。
+            滟滟随波千万里，何处春江无月明！
+            江流宛转绕芳甸，月照花林皆似霰；
+            空里流霜不觉飞，汀上白沙看不见。
+            江天一色无纤尘，皎皎空中孤月轮。
+            江畔何人初见月？江月何年初照人？
+            人生代代无穷已，江月年年望相似。
+            不知江月待何人，但见长江送流水。
+            白云一片去悠悠，青枫浦上不胜愁。
+            谁家今夜扁舟子？何处相思明月楼？
+            可怜楼上月徘徊，应照离人妆镜台。
+            玉户帘中卷不去，捣衣砧上拂还来。
+            此时相望不相闻，愿逐月华流照君。
+            鸿雁长飞光不度，鱼龙潜跃水成文。
+            昨夜闲潭梦落花，可怜春半不还家。
+            江水流春去欲尽，江潭落月复西斜。
+            斜月沉沉藏海雾，碣石潇湘无限路。
+            不知乘月几人归，落月摇情满江树。
+        </div>
+        <div id="draggable" style="display:inline-block;width:100px;height:100px;background-color:green"></div>
+    </body>
+
+<script>
+    let draggable = document.getElementById("draggable");
+
+    // draggable的translate值
+    let baseX = 0,baseY = 0;
+    // 在mousedown里面监听mousemove,mouseup.因为只有在鼠标按下后才会有拖拽效果，从性能上和逻辑上最合理
+    // 另，mousemove,mouseup需要在document上监听，防止鼠标移动过快离开draggable时无法拖动情况出现
+    draggable.addEventListener("mousedown",function(event){
+        // 存储鼠标的起始点
+        let startX = event.clientX,startY = event.clientY;
+
+        let up = event=>{
+            baseX = baseX + event.clientX - startX;
+            baseY = baseY + event.clientY - startY;
+            document.removeEventListener("mousemove",move)
+            document.removeEventListener("mouseup",up)
+        }
+        let move = event=>{
+            let range = getNearest(event.clientX,event.clientY);
+            range.insertNode(draggable)
+        //    draggable.style.transform =  `translate(${baseX + event.clientX - startX}px,${baseY + event.clientY - startY}px)`
+        }
+        document.addEventListener("mousemove",move)
+        document.addEventListener("mouseup",up)
+
+    })
+
+    let ranges = [];
+
+    let container = document.getElementById("container");
+    for(let i = 0;i < container.childNodes[0].textContent.length; i++){
+        let range = document.createRange();
+        range.setStart(container.childNodes[0],i);
+        range.setEnd(container.childNodes[0],i);
+
+        // console.log(range.getBoundingClientRect());
+        ranges.push(range);
+    }
+   
+    function getNearest(x,y){
+        let min = Infinity;
+        let nearest = null;
+        for(let range of ranges){
+            let rect = range.getBoundingClientRect();
+            let distance = (rect.x - x) ** 2 + (rect.y - y) ** 2;
+            if(distance < min){
+                nearest = range;
+                min = distance;
+            }
+        }
+        return nearest;
+    }
+    document.addEventListener("selectstart",event => event.preventDefault())
+
+    console.log(getNearest(0,0));
+    console.log(getNearest(0,0).getBoundingClientRect());
+</script>
+</html>
